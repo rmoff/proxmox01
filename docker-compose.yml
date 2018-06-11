@@ -92,42 +92,6 @@ services:
     volumes:
       - /home/rmoff/connect-jars:/connect-jars
 
-# Isolate syslog connector as it gets upset if restarted, which will happen when any other
-# connectors in the same cluster are added/removed
-  connect-syslog:
-    image: confluentinc/cp-kafka-connect
-    hostname: connect-syslog
-    depends_on:
-      - zookeeper
-      - kafka
-      - schema-registry
-    ports:
-      - "8084:8084"
-      - "42514:42514"
-    environment:
-      CONNECT_BOOTSTRAP_SERVERS: 'kafka:19092'
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect-syslog
-      CONNECT_REST_PORT: 8084
-      CONNECT_GROUP_ID: compose-connect-group-syslog
-      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs-syslog
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
-      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets-syslog
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status-syslog
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      CONNECT_PLUGIN_PATH: /usr/share/java,/connect-jars
-      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
-    volumes:
-      - /home/rmoff/connect-jars:/connect-jars
-
   control-center:
     image: confluentinc/cp-enterprise-control-center
     hostname: control-center
